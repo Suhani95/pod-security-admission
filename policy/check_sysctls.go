@@ -84,6 +84,10 @@ func CheckSysctls() Check {
 				MinimumVersion: api.MajorMinorVersion(1, 37),
 				CheckPod:       sysctlsV1Dot37,
 			},
+			{
+				MinimumVersion: api.MajorMinorVersion(1, 38),
+				CheckPod:       sysctlsV1Dot38,
+			},
 		},
 	}
 }
@@ -113,6 +117,9 @@ var (
 		"net.ipv4.tcp_slow_start_after_idle",
 		"net.ipv4.tcp_notsent_lowat",
 	))
+	sysctlsAllowedV1Dot38 = sysctlsAllowedV1Dot37.Union(sets.NewString(
+		"net.ipv4.tcp_fastopen",
+	))
 )
 
 func sysctlsV1Dot0(podMetadata *metav1.ObjectMeta, podSpec *corev1.PodSpec) CheckResult {
@@ -133,6 +140,10 @@ func sysctlsV1Dot32(podMetadata *metav1.ObjectMeta, podSpec *corev1.PodSpec) Che
 
 func sysctlsV1Dot37(podMetadata *metav1.ObjectMeta, podSpec *corev1.PodSpec) CheckResult {
 	return sysctls(podMetadata, podSpec, sysctlsAllowedV1Dot37)
+}
+
+func sysctlsV1Dot38(podMetadata *metav1.ObjectMeta, podSpec *corev1.PodSpec) CheckResult {
+	return sysctls(podMetadata, podSpec, sysctlsAllowedV1Dot38)
 }
 
 func sysctls(podMetadata *metav1.ObjectMeta, podSpec *corev1.PodSpec, sysctls_allowed_set sets.String) CheckResult {
