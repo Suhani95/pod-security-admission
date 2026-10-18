@@ -226,4 +226,38 @@ func init() {
 		fixtureKey{level: api.LevelBaseline, version: api.MajorMinorVersion(1, 37), check: "sysctls"},
 		fixtureDataV1Dot37,
 	)
+
+	fixtureDataV1Dot38 := fixtureGenerator{
+		expectErrorSubstring: "forbidden sysctl",
+		generatePass: func(p *corev1.Pod, _ api.Level) []*corev1.Pod {
+			if p.Spec.SecurityContext == nil {
+				p.Spec.SecurityContext = &corev1.PodSecurityContext{}
+			}
+			return []*corev1.Pod{
+				// security context with no sysctls
+				tweak(p, func(p *corev1.Pod) { p.Spec.SecurityContext.Sysctls = nil }),
+				// sysctls with name="net.ipv4.tcp_fastopen"
+				tweak(p, func(p *corev1.Pod) {
+					p.Spec.SecurityContext.Sysctls = []corev1.Sysctl{
+						{Name: "net.ipv4.tcp_fastopen", Value: "1"},
+					}
+				}),
+			}
+		},
+		generateFail: func(p *corev1.Pod) []*corev1.Pod {
+			if p.Spec.SecurityContext == nil {
+				p.Spec.SecurityContext = &corev1.PodSecurityContext{}
+			}
+			return []*corev1.Pod{
+				// sysctls with out of allowed name
+				tweak(p, func(p *corev1.Pod) {
+					p.Spec.SecurityContext.Sysctls = []corev1.Sysctl{{Name: "othersysctl", Value: "other"}}
+				}),
+			}
+		},
+	}
+	registerFixtureGenerator(
+		fixtureKey{level: api.LevelBaseline, version: api.MajorMinorVersion(1, 38), check: "sysctls"},
+		fixtureDataV1Dot38,
+	)
 }

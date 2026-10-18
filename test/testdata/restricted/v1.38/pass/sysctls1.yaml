@@ -24,7 +24,5 @@ spec:
     seccompProfile:
       type: RuntimeDefault
     sysctls:
-    - name: net.ipv4.tcp_slow_start_after_idle
-      value: "0"
-    - name: net.ipv4.tcp_notsent_lowat
-      value: "16384"
+    - name: net.ipv4.tcp_fastopen
+      value: "1"
