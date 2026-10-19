@@ -9,4 +9,7 @@ spec:
   initContainers:
   - image: registry.k8s.io/pause
     name: initcontainer1
-  securityContext: {}
+  securityContext:
+    sysctls:
+    - name: net.ipv4.tcp_keepalive_time
+      value: "7200"
