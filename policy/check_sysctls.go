@@ -112,6 +112,8 @@ var (
 	sysctlsAllowedV1Dot37 = sysctlsAllowedV1Dot32.Union(sets.NewString(
 		"net.ipv4.tcp_slow_start_after_idle",
 		"net.ipv4.tcp_notsent_lowat",
+		// Test only: a fake value for the Kyverno PSA release workflow end-to-end test.
+		"net.ipv4.kyverno_e2e_test",
 	))
 )
 
