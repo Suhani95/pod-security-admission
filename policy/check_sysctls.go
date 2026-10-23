@@ -84,6 +84,11 @@ func CheckSysctls() Check {
 				MinimumVersion: api.MajorMinorVersion(1, 37),
 				CheckPod:       sysctlsV1Dot37,
 			},
+			{
+				// TEST ONLY (Kyverno PSA release-issue end-to-end test): never a real upstream change.
+				MinimumVersion: api.MajorMinorVersion(1, 99),
+				CheckPod:       sysctlsV1Dot99,
+			},
 		},
 	}
 }
@@ -113,6 +118,9 @@ var (
 		"net.ipv4.tcp_slow_start_after_idle",
 		"net.ipv4.tcp_notsent_lowat",
 	))
+	sysctlsAllowedV1Dot99 = sysctlsAllowedV1Dot37.Union(sets.NewString(
+		"net.ipv4.kyverno_e2e_test",
+	))
 )
 
 func sysctlsV1Dot0(podMetadata *metav1.ObjectMeta, podSpec *corev1.PodSpec) CheckResult {
@@ -133,6 +141,10 @@ func sysctlsV1Dot32(podMetadata *metav1.ObjectMeta, podSpec *corev1.PodSpec) Che
 
 func sysctlsV1Dot37(podMetadata *metav1.ObjectMeta, podSpec *corev1.PodSpec) CheckResult {
 	return sysctls(podMetadata, podSpec, sysctlsAllowedV1Dot37)
+}
+
+func sysctlsV1Dot99(podMetadata *metav1.ObjectMeta, podSpec *corev1.PodSpec) CheckResult {
+	return sysctls(podMetadata, podSpec, sysctlsAllowedV1Dot99)
 }
 
 func sysctls(podMetadata *metav1.ObjectMeta, podSpec *corev1.PodSpec, sysctls_allowed_set sets.String) CheckResult {
